@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>5월 2일 여름맞이 체육대회</title>
+    <title>10/2 ~ 10/13 이집트 다합 투어 🇪🇬</title>
     <style>
         :root {
             --bg: #fafafa;
@@ -16,7 +16,8 @@
             --secondary: #efefef;
             --danger: #ed4956;
             --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            --ig-gradient-soft: linear-gradient(135deg, #fde2c4 0%, #fcd0c0 25%, #f8c1d0 50%, #e8c5dc 75%, #d8c2e3 100%);
+            --instructor-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --ig-gradient-soft: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 25%, #fce7f3 50%, #fef3c7 100%);
         }
 
         * {
@@ -38,35 +39,35 @@
         .container {
             max-width: 720px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.45);
             backdrop-filter: blur(18px) saturate(160%);
             -webkit-backdrop-filter: blur(18px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 24px;
-            padding: 8px 16px 24px;
-            box-shadow: 0 20px 60px rgba(80, 40, 100, 0.12);
+            padding: 12px 16px 28px;
+            box-shadow: 0 20px 60px rgba(40, 80, 120, 0.12);
         }
 
         header {
             text-align: center;
             padding: 28px 24px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.88);
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(14px) saturate(150%);
             -webkit-backdrop-filter: blur(14px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: 20px;
             box-shadow:
-                0 1px 2px rgba(80, 40, 100, 0.06),
-                0 6px 16px rgba(80, 40, 100, 0.08),
-                0 16px 40px rgba(80, 40, 100, 0.06);
+                0 1px 2px rgba(40, 80, 120, 0.06),
+                0 6px 16px rgba(40, 80, 120, 0.08),
+                0 16px 40px rgba(40, 80, 120, 0.06);
         }
 
         header h1 {
             font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.02em;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         header .subtitle {
@@ -78,6 +79,8 @@
             display: inline-flex;
             gap: 8px;
             margin-top: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .stat-item {
@@ -89,13 +92,24 @@
             font-weight: 600;
         }
 
+        .stat-item.highlight {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .section-group {
+            margin-bottom: 24px;
+        }
+
         .section-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin: 8px 4px 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #475569;
+            letter-spacing: 0.02em;
+            margin: 12px 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .user-list {
@@ -107,29 +121,37 @@
         .user-card {
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(14px) saturate(150%);
             -webkit-backdrop-filter: blur(14px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             padding: 12px 14px;
             border-radius: 16px;
             box-shadow:
-                0 1px 2px rgba(80, 40, 100, 0.06),
-                0 6px 16px rgba(80, 40, 100, 0.08),
-                0 16px 40px rgba(80, 40, 100, 0.06);
+                0 1px 2px rgba(40, 80, 120, 0.06),
+                0 4px 12px rgba(40, 80, 120, 0.06);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .user-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow:
-                0 2px 4px rgba(80, 40, 100, 0.08),
-                0 10px 24px rgba(80, 40, 100, 0.14),
-                0 24px 56px rgba(80, 40, 100, 0.10);
+                0 4px 8px rgba(40, 80, 120, 0.08),
+                0 12px 24px rgba(40, 80, 120, 0.12);
+        }
+
+        .user-card.instructor-card {
+            border-left: 4px solid #0284c7;
+            background: rgba(240, 249, 255, 0.92);
+        }
+
+        .user-card.non-insta-card {
+            opacity: 0.85;
+            border-style: dashed;
         }
 
         .user-card.failed {
-            opacity: 0.6;
+            opacity: 0.65;
         }
 
         .avatar-ring {
@@ -142,6 +164,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .avatar-ring.instructor-ring {
+            background: var(--instructor-gradient);
         }
 
         .avatar-ring.muted {
@@ -174,13 +200,17 @@
 
         .tag {
             font-size: 0.65rem;
-            font-weight: 600;
+            font-weight: 700;
             padding: 2px 8px;
             border-radius: 999px;
             background: var(--secondary);
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.02em;
+        }
+
+        .tag.instructor {
+            background: #e0f2fe;
+            color: #0369a1;
         }
 
         .tag.private {
@@ -229,8 +259,8 @@
 
         footer {
             text-align: center;
-            margin-top: 48px;
-            color: rgba(60, 40, 70, 0.55);
+            margin-top: 40px;
+            color: rgba(60, 80, 100, 0.6);
             font-size: 0.75rem;
         }
 
@@ -240,7 +270,7 @@
             }
 
             .user-card {
-                padding: 8px 6px;
+                padding: 10px 10px;
             }
 
             .avatar-ring {
@@ -258,117 +288,53 @@
 <body>
     <div class="container">
         <header>
-            <h1>☀️🏃‍♀️ 5월 2일 여름맞이 체육대회 🏃‍♂️🏆</h1>
-            <p class="subtitle">마지막 업데이트 · 2026-05-04 11:22</p>
+            <h1>🌊 10/2 ~ 10/13 이집트 다합 투어 🇪🇬</h1>
+            <p class="subtitle">마지막 업데이트 · 2026-09-24 16:22</p>
             <div class="stats">
-                <div class="stat-item">참여자 45</div>
+                <div class="stat-item highlight">총 인원 13명</div>
+                <div class="stat-item">강사진 2명</div>
+                <div class="stat-item">참여자 7명</div>
+                <div class="stat-item">미등록 4명</div>
             </div>
         </header>
         <main>
-            <h2 class="section-title">참여자 · 45</h2>
+            
+        <section class="section-group">
+            <h2 class="section-title">🤿 강사진 · 2명</h2>
             <div class="user-list">
                 
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/yeoriyeori.jpg" onerror="this.src='assets/default.svg'" alt="yeoriyeori">
+                <div class="user-card instructor-card">
+                    <div class="avatar-ring instructor-ring">
+                        <img src="assets/jjungoo.world.jpg" onerror="this.src='assets/default.svg'" alt="jjungoo.world">
                     </div>
                     <div class="info">
-                        <div class="username">yeoriyeori</div>
-                        <div class="fullname">남성열</div>
+                        <div class="username">jjungoo.world<span class="tag instructor">강사</span></div>
+                        <div class="fullname">전성호(BP) / 캄인블루프리다이빙 대표</div>
                     </div>
-                    <a href="https://www.instagram.com/yeoriyeori/" target="_blank" rel="noopener" class="btn">팔로우</a>
+                    <a href="https://www.instagram.com/jjungoo.world/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/tsy_0.jpg" onerror="this.src='assets/default.svg'" alt="tsy_0">
+                <div class="user-card instructor-card">
+                    <div class="avatar-ring instructor-ring">
+                        <img src="assets/diver_yusin.jpg" onerror="this.src='assets/default.svg'" alt="diver_yusin">
                     </div>
                     <div class="info">
-                        <div class="username">tsy_0</div>
-                        <div class="fullname">양서영</div>
+                        <div class="username">diver_yusin<span class="tag instructor">강사</span></div>
+                        <div class="fullname">유신 (강사)</div>
                     </div>
-                    <a href="https://www.instagram.com/tsy_0/" target="_blank" rel="noopener" class="btn">팔로우</a>
+                    <a href="https://www.instagram.com/diver_yusin/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/travelerj87.jpg" onerror="this.src='assets/default.svg'" alt="travelerj87">
-                    </div>
-                    <div class="info">
-                        <div class="username">travelerj87</div>
-                        <div class="fullname">Sunghoon Ji / 프리다이버</div>
-                    </div>
-                    <a href="https://www.instagram.com/travelerj87/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/kang_iseul_.jpg" onerror="this.src='assets/default.svg'" alt="kang_iseul_">
-                    </div>
-                    <div class="info">
-                        <div class="username">kang_iseul_</div>
-                        <div class="fullname">프리다이빙 강사 🐬/ 강이슬</div>
-                    </div>
-                    <a href="https://www.instagram.com/kang_iseul_/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/zzv___zzv.jpg" onerror="this.src='assets/default.svg'" alt="zzv___zzv">
-                    </div>
-                    <div class="info">
-                        <div class="username">zzv___zzv</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/zzv___zzv/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/jieun.lee0000.jpg" onerror="this.src='assets/default.svg'" alt="jieun.lee0000">
-                    </div>
-                    <div class="info">
-                        <div class="username">jieun.lee0000</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/jieun.lee0000/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/hyukjun___kwon.jpg" onerror="this.src='assets/default.svg'" alt="hyukjun___kwon">
-                    </div>
-                    <div class="info">
-                        <div class="username">hyukjun___kwon</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/hyukjun___kwon/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/hope_inna.jpg" onerror="this.src='assets/default.svg'" alt="hope_inna">
-                    </div>
-                    <div class="info">
-                        <div class="username">hope_inna</div>
-                        <div class="fullname">응비</div>
-                    </div>
-                    <a href="https://www.instagram.com/hope_inna/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/jjem_b.jpg" onerror="this.src='assets/default.svg'" alt="jjem_b">
-                    </div>
-                    <div class="info">
-                        <div class="username">jjem_b</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/jjem_b/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
+            </div>
+        </section>
+        
+
+            <section class="section-group">
+                <h2 class="section-title">👥 참가자 · 7명</h2>
+                <div class="user-list">
+                    
+                <div class="user-card ">
+                    <div class="avatar-ring ">
                         <img src="assets/ahang486.jpg" onerror="this.src='assets/default.svg'" alt="ahang486">
                     </div>
                     <div class="info">
@@ -378,162 +344,19 @@
                     <a href="https://www.instagram.com/ahang486/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/hwicook.jpg" onerror="this.src='assets/default.svg'" alt="hwicook">
+                <div class="user-card ">
+                    <div class="avatar-ring ">
+                        <img src="assets/jieun.lee0000.jpg" onerror="this.src='assets/default.svg'" alt="jieun.lee0000">
                     </div>
                     <div class="info">
-                        <div class="username">hwicook</div>
-                        <div class="fullname">휘쿡 / 다양한 리뷰. 도전. 음식</div>
+                        <div class="username">jieun.lee0000</div>
+                        <div class="fullname">&nbsp;</div>
                     </div>
-                    <a href="https://www.instagram.com/hwicook/" target="_blank" rel="noopener" class="btn">팔로우</a>
+                    <a href="https://www.instagram.com/jieun.lee0000/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/hedge_l.jpg" onerror="this.src='assets/default.svg'" alt="hedge_l">
-                    </div>
-                    <div class="info">
-                        <div class="username">hedge_l</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/hedge_l/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/grandblue__art.jpg" onerror="this.src='assets/default.svg'" alt="grandblue__art">
-                    </div>
-                    <div class="info">
-                        <div class="username">grandblue__art</div>
-                        <div class="fullname">러브 아트 서아영 💜 요가를 나누는</div>
-                    </div>
-                    <a href="https://www.instagram.com/grandblue__art/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/heti.0214.jpg" onerror="this.src='assets/default.svg'" alt="heti.0214">
-                    </div>
-                    <div class="info">
-                        <div class="username">heti.0214</div>
-                        <div class="fullname">햇이</div>
-                    </div>
-                    <a href="https://www.instagram.com/heti.0214/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/angela3549.jpg" onerror="this.src='assets/default.svg'" alt="angela3549">
-                    </div>
-                    <div class="info">
-                        <div class="username">angela3549</div>
-                        <div class="fullname">Angie Kim</div>
-                    </div>
-                    <a href="https://www.instagram.com/angela3549/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/leehar1n.jpg" onerror="this.src='assets/default.svg'" alt="leehar1n">
-                    </div>
-                    <div class="info">
-                        <div class="username">leehar1n</div>
-                        <div class="fullname">하린</div>
-                    </div>
-                    <a href="https://www.instagram.com/leehar1n/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/yunmiokk.jpg" onerror="this.src='assets/default.svg'" alt="yunmiokk">
-                    </div>
-                    <div class="info">
-                        <div class="username">yunmiokk</div>
-                        <div class="fullname">miok</div>
-                    </div>
-                    <a href="https://www.instagram.com/yunmiokk/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/i_am_jyung.jpg" onerror="this.src='assets/default.svg'" alt="i_am_jyung">
-                    </div>
-                    <div class="info">
-                        <div class="username">i_am_jyung</div>
-                        <div class="fullname">Jiyoung Jung</div>
-                    </div>
-                    <a href="https://www.instagram.com/i_am_jyung/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/naraxxanne.jpg" onerror="this.src='assets/default.svg'" alt="naraxxanne">
-                    </div>
-                    <div class="info">
-                        <div class="username">naraxxanne</div>
-                        <div class="fullname">NARA.2</div>
-                    </div>
-                    <a href="https://www.instagram.com/naraxxanne/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/j.__.sy.jpg" onerror="this.src='assets/default.svg'" alt="j.__.sy">
-                    </div>
-                    <div class="info">
-                        <div class="username">j.__.sy</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/j.__.sy/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/simba___two.jpg" onerror="this.src='assets/default.svg'" alt="simba___two">
-                    </div>
-                    <div class="info">
-                        <div class="username">simba___two</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/simba___two/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/brp0077.jpg" onerror="this.src='assets/default.svg'" alt="brp0077">
-                    </div>
-                    <div class="info">
-                        <div class="username">brp0077</div>
-                        <div class="fullname">노우진</div>
-                    </div>
-                    <a href="https://www.instagram.com/brp0077/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/jihxe.jpg" onerror="this.src='assets/default.svg'" alt="jihxe">
-                    </div>
-                    <div class="info">
-                        <div class="username">jihxe</div>
-                        <div class="fullname">최지혜</div>
-                    </div>
-                    <a href="https://www.instagram.com/jihxe/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/imxoo_days.jpg" onerror="this.src='assets/default.svg'" alt="imxoo_days">
-                    </div>
-                    <div class="info">
-                        <div class="username">imxoo_days</div>
-                        <div class="fullname">임수</div>
-                    </div>
-                    <a href="https://www.instagram.com/imxoo_days/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
+                <div class="user-card ">
+                    <div class="avatar-ring ">
                         <img src="assets/_h.eco.jpg" onerror="this.src='assets/default.svg'" alt="_h.eco">
                     </div>
                     <div class="info">
@@ -543,96 +366,19 @@
                     <a href="https://www.instagram.com/_h.eco/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/stella._.sophie.jpg" onerror="this.src='assets/default.svg'" alt="stella._.sophie">
+                <div class="user-card ">
+                    <div class="avatar-ring ">
+                        <img src="assets/_sungwo.jpg" onerror="this.src='assets/default.svg'" alt="_sungwo">
                     </div>
                     <div class="info">
-                        <div class="username">stella._.sophie</div>
-                        <div class="fullname">sophie</div>
+                        <div class="username">_sungwo</div>
+                        <div class="fullname">성우</div>
                     </div>
-                    <a href="https://www.instagram.com/stella._.sophie/" target="_blank" rel="noopener" class="btn">팔로우</a>
+                    <a href="https://www.instagram.com/_sungwo/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/ehaera__.jpg" onerror="this.src='assets/default.svg'" alt="ehaera__">
-                    </div>
-                    <div class="info">
-                        <div class="username">ehaera__</div>
-                        <div class="fullname">동환</div>
-                    </div>
-                    <a href="https://www.instagram.com/ehaera__/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/juyeon210_s2.jpg" onerror="this.src='assets/default.svg'" alt="juyeon210_s2">
-                    </div>
-                    <div class="info">
-                        <div class="username">juyeon210_s2</div>
-                        <div class="fullname">주연🐰</div>
-                    </div>
-                    <a href="https://www.instagram.com/juyeon210_s2/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/hurancheska.jpg" onerror="this.src='assets/default.svg'" alt="hurancheska">
-                    </div>
-                    <div class="info">
-                        <div class="username">hurancheska</div>
-                        <div class="fullname"> </div>
-                    </div>
-                    <a href="https://www.instagram.com/hurancheska/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/jjungoo.world.jpg" onerror="this.src='assets/default.svg'" alt="jjungoo.world">
-                    </div>
-                    <div class="info">
-                        <div class="username">jjungoo.world</div>
-                        <div class="fullname">전성호(BP) / 캄인블루프리다이빙 대표</div>
-                    </div>
-                    <a href="https://www.instagram.com/jjungoo.world/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/ddddoodii.jpg" onerror="this.src='assets/default.svg'" alt="ddddoodii">
-                    </div>
-                    <div class="info">
-                        <div class="username">ddddoodii</div>
-                        <div class="fullname">본격적 탐험 계정</div>
-                    </div>
-                    <a href="https://www.instagram.com/ddddoodii/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/sehee.86.jpg" onerror="this.src='assets/default.svg'" alt="sehee.86">
-                    </div>
-                    <div class="info">
-                        <div class="username">sehee.86</div>
-                        <div class="fullname">Kkong Kkong</div>
-                    </div>
-                    <a href="https://www.instagram.com/sehee.86/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/jessie_kimm.jpg" onerror="this.src='assets/default.svg'" alt="jessie_kimm">
-                    </div>
-                    <div class="info">
-                        <div class="username">jessie_kimm</div>
-                        <div class="fullname">Jessie</div>
-                    </div>
-                    <a href="https://www.instagram.com/jessie_kimm/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
+                <div class="user-card ">
+                    <div class="avatar-ring ">
                         <img src="assets/ssun0ee.jpg" onerror="this.src='assets/default.svg'" alt="ssun0ee">
                     </div>
                     <div class="info">
@@ -642,131 +388,48 @@
                     <a href="https://www.instagram.com/ssun0ee/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
+                <div class="user-card ">
+                    <div class="avatar-ring ">
                         <img src="assets/hssu__15.jpg" onerror="this.src='assets/default.svg'" alt="hssu__15">
                     </div>
                     <div class="info">
                         <div class="username">hssu__15</div>
-                        <div class="fullname"> </div>
+                        <div class="fullname">&nbsp;</div>
                     </div>
                     <a href="https://www.instagram.com/hssu__15/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/mimi__jo__.jpg" onerror="this.src='assets/default.svg'" alt="mimi__jo__">
+                <div class="user-card ">
+                    <div class="avatar-ring ">
+                        <img src="assets/i_am_tosil.jpg" onerror="this.src='assets/default.svg'" alt="i_am_tosil">
                     </div>
                     <div class="info">
-                        <div class="username">mimi__jo__</div>
-                        <div class="fullname"> </div>
+                        <div class="username">i_am_tosil</div>
+                        <div class="fullname">토실</div>
                     </div>
-                    <a href="https://www.instagram.com/mimi__jo__/" target="_blank" rel="noopener" class="btn">팔로우</a>
+                    <a href="https://www.instagram.com/i_am_tosil/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/0rindive.jpg" onerror="this.src='assets/default.svg'" alt="0rindive">
-                    </div>
-                    <div class="info">
-                        <div class="username">0rindive</div>
-                        <div class="fullname">오린 | Freediving</div>
-                    </div>
-                    <a href="https://www.instagram.com/0rindive/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/kkpinktiger.jpg" onerror="this.src='assets/default.svg'" alt="kkpinktiger">
-                    </div>
-                    <div class="info">
-                        <div class="username">kkpinktiger</div>
-                        <div class="fullname">DoubleK.JH</div>
-                    </div>
-                    <a href="https://www.instagram.com/kkpinktiger/" target="_blank" rel="noopener" class="btn">팔로우</a>
+            </section>
+
+            
+        <section class="section-group">
+            <h2 class="section-title">✨ 그 외 함께하는 분들 · 4명</h2>
+            <div class="user-card non-insta-card">
+                <div class="avatar-ring muted">
+                    <img src="assets/default.svg" alt="미참여">
                 </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/giraffdoyeun.jpg" onerror="this.src='assets/default.svg'" alt="giraffdoyeun">
-                    </div>
-                    <div class="info">
-                        <div class="username">giraffdoyeun</div>
-                        <div class="fullname">이도연</div>
-                    </div>
-                    <a href="https://www.instagram.com/giraffdoyeun/" target="_blank" rel="noopener" class="btn">팔로우</a>
+                <div class="info">
+                    <div class="username">인스타그램 미등록 멤버 <span class="tag">4명</span></div>
+                    <div class="fullname">인스타그램 계정이 없거나 등록되지 않은 동행 인원입니다</div>
                 </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/psycho0628.jpg" onerror="this.src='assets/default.svg'" alt="psycho0628">
-                    </div>
-                    <div class="info">
-                        <div class="username">psycho0628</div>
-                        <div class="fullname">심민섭</div>
-                    </div>
-                    <a href="https://www.instagram.com/psycho0628/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/kyoung0728.jpg" onerror="this.src='assets/default.svg'" alt="kyoung0728">
-                    </div>
-                    <div class="info">
-                        <div class="username">kyoung0728</div>
-                        <div class="fullname">승경</div>
-                    </div>
-                    <a href="https://www.instagram.com/kyoung0728/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/2_eunchu.jpg" onerror="this.src='assets/default.svg'" alt="2_eunchu">
-                    </div>
-                    <div class="info">
-                        <div class="username">2_eunchu</div>
-                        <div class="fullname">은츄 | 어디서든 자유롭게 나답게:)</div>
-                    </div>
-                    <a href="https://www.instagram.com/2_eunchu/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/diver_goevia.jpg" onerror="this.src='assets/default.svg'" alt="diver_goevia">
-                    </div>
-                    <div class="info">
-                        <div class="username">diver_goevia</div>
-                        <div class="fullname">🧜🏻‍♀️구의동큰손 고에비아 l 다이빙•여행•일상기록</div>
-                    </div>
-                    <a href="https://www.instagram.com/diver_goevia/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/wooki_871224.jpg" onerror="this.src='assets/default.svg'" alt="wooki_871224">
-                    </div>
-                    <div class="info">
-                        <div class="username">wooki_871224</div>
-                        <div class="fullname">오키도키우키포키</div>
-                    </div>
-                    <a href="https://www.instagram.com/wooki_871224/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card">
-                    <div class="avatar-ring">
-                        <img src="assets/shunglebangle.jpg" onerror="this.src='assets/default.svg'" alt="shunglebangle">
-                    </div>
-                    <div class="info">
-                        <div class="username">shunglebangle</div>
-                        <div class="fullname">슌글방글 | freediving</div>
-                    </div>
-                    <a href="https://www.instagram.com/shunglebangle/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
             </div>
+        </section>
+        
         </main>
         <footer>
-            <p>Powered by Instagram Follower Tracker</p>
+            <p>10/2 ~ 10/13 Dahab Diving Tour</p>
         </footer>
     </div>
 </body>

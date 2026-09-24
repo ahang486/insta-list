@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Instagram Follower Tracker
-- 사용자 목록에서 프로필 정보를 가져와 HTML 파일 생성
+- 사용자 및 강사 목록에서 프로필 정보를 가져와 HTML 파일 생성
 - 프로필 사진을 로컬 assets 폴더에 다운로드
 - GitHub Pages 배포용
 """
@@ -10,17 +10,18 @@ import instaloader
 import requests
 import time
 import os
+import json
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
 
 def load_users(filepath: str = "users.txt") -> list[str]:
-    """users.txt에서 사용자 목록을 읽어옵니다."""
+    """users.txt / instructors.txt에서 사용자 목록을 읽어옵니다."""
     users = []
     
     if not os.path.exists(filepath):
-        print(f"⚠️ {filepath} 파일이 없습니다. 샘플 파일을 생성해주세요.")
+        print(f"⚠️ {filepath} 파일이 없습니다.")
         return users
     
     with open(filepath, "r", encoding="utf-8") as f:
@@ -56,7 +57,6 @@ def create_default_image(assets_dir: str):
     if os.path.exists(default_path):
         return
     
-    # 심플한 기본 프로필 SVG 생성
     svg_content = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <circle cx="50" cy="50" r="50" fill="#e0e0e0"/>
   <circle cx="50" cy="38" r="18" fill="#bdbdbd"/>
@@ -67,7 +67,6 @@ def create_default_image(assets_dir: str):
     with open(default_path, "w", encoding="utf-8") as f:
         f.write(svg_content)
     print("  └─ 완료!")
-
 
 
 def fetch_user_data(username: str, L: instaloader.Instaloader, assets_dir: str, cache: dict, cache_file: str) -> tuple[dict, bool]:
@@ -81,12 +80,10 @@ def fetch_user_data(username: str, L: instaloader.Instaloader, assets_dir: str, 
     
     # 캐시 확인
     if username in cache:
-        # 이미지 파일도 실제로 존재하는지 확인
         img_path = os.path.join(assets_dir, f"{username}.jpg")
-        # 성공했던 기록(success is True)이고 이미지가 있는 경우만 캐시 사용 (실패했던 건은 재시도)
         if cache[username].get('success') is True and os.path.exists(img_path):
-             print(f"  └─ 📦 캐시 사용")
-             return cache[username], True
+            print(f"  └─ 📦 캐시 사용")
+            return cache[username], True
     
     try:
         # 프로필 정보 가져오기
@@ -96,7 +93,6 @@ def fetch_user_data(username: str, L: instaloader.Instaloader, assets_dir: str, 
         user_info["full_name"] = profile.full_name
         user_info["is_private"] = profile.is_private
         
-        # 프로필 사진 다운로드 (이미 존재하면 스킵)
         img_path = os.path.join(assets_dir, f"{username}.jpg")
         if os.path.exists(img_path):
             print(f"  └─ ✅ 성공 (이미지 이미 존재)")
@@ -120,7 +116,7 @@ def fetch_user_data(username: str, L: instaloader.Instaloader, assets_dir: str, 
             
             if title_match and img_match:
                 title_text = html.unescape(title_match.group(1))
-                full_name = title_text.split("(@")[0].strip() if "(@" in title_text else username
+                full_name = title_text.split("(@")[0].strip() if "(@ " in title_text or "(@" in title_text else username
                 pic_url = html.unescape(img_match.group(1))
                 
                 private_match = re.search(r'"is_private":\s*(true|false)', html_content)
@@ -139,15 +135,13 @@ def fetch_user_data(username: str, L: instaloader.Instaloader, assets_dir: str, 
                     print(f"  └─ ✅ 성공 (Fallback, 이미지 저장 실패)")
             else:
                 print(f"  └─ ❌ 실패: {str(e)[:50]}")
-        except Exception as fallback_e:
+        except Exception:
             print(f"  └─ ❌ 실패: {str(e)[:50]}")
     
     # 캐시 업데이트 및 저장
     cache[username] = user_info
     
-    # 중간 저장 (실행 중단 대비)
     try:
-        import json
         with open(cache_file, "w", encoding="utf-8") as f:
             json.dump(cache, f, ensure_ascii=False, indent=2)
     except Exception as e:
@@ -158,8 +152,7 @@ def fetch_user_data(username: str, L: instaloader.Instaloader, assets_dir: str, 
 
 def load_config(filepath: str = "config.json") -> dict:
     """config.json에서 페이지 설정을 읽어옵니다."""
-    import json
-    defaults = {"title": "Insta List", "heading": "Insta List"}
+    defaults = {"title": "Insta List", "heading": "Insta List", "non_insta_count": 0}
     if not os.path.exists(filepath):
         return defaults
     try:
@@ -171,45 +164,75 @@ def load_config(filepath: str = "config.json") -> dict:
         return defaults
 
 
-def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_data: list[dict], total_count: int, config: dict) -> str:
+def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors_data: list[dict], total_count: int, config: dict) -> str:
     """HTML 컨텐츠를 생성합니다."""
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     title = config.get("title", "Insta List")
     heading = config.get("heading", title)
+    non_insta_count = int(config.get("non_insta_count", 0))
     
     # 사용자 카드 HTML 생성 헬퍼 함수
-    def create_user_cards(data_list):
+    def create_user_cards(data_list, is_instructor=False):
         cards_html = ""
         for user in data_list:
+            role_badge = '<span class="tag instructor">강사</span>' if is_instructor else ''
             if user["success"]:
                 privacy_tag = '<span class="tag private">비공개</span>' if user["is_private"] else ''
                 cards_html += f"""
-                <div class="user-card">
-                    <div class="avatar-ring">
+                <div class="user-card {'instructor-card' if is_instructor else ''}">
+                    <div class="avatar-ring {'instructor-ring' if is_instructor else ''}">
                         <img src="assets/{user['username']}.jpg" onerror="this.src='assets/default.svg'" alt="{user['username']}">
                     </div>
                     <div class="info">
-                        <div class="username">{user['username']}{privacy_tag}</div>
-                        <div class="fullname">{user['full_name'] or ' '}</div>
+                        <div class="username">{user['username']}{role_badge}{privacy_tag}</div>
+                        <div class="fullname">{user['full_name'] or '&nbsp;'}</div>
                     </div>
                     <a href="https://www.instagram.com/{user['username']}/" target="_blank" rel="noopener" class="btn">팔로우</a>
                 </div>
     """
             else:
                 cards_html += f"""
-                <div class="user-card failed">
+                <div class="user-card failed {'instructor-card' if is_instructor else ''}">
                     <div class="avatar-ring muted">
                         <img src="assets/default.svg" alt="{user['username']}">
                     </div>
                     <div class="info">
-                        <div class="username">{user['username']}<span class="tag failed">조회 실패</span></div>
+                        <div class="username">{user['username']}{role_badge}<span class="tag failed">조회 실패</span></div>
                         <div class="fullname">정보를 가져올 수 없습니다</div>
                     </div>
                     <a href="https://www.instagram.com/{user['username']}/" target="_blank" rel="noopener" class="btn secondary">확인</a>
                 </div>
     """
         return cards_html
+
+    instructors_section = ""
+    if instructors_data:
+        instructors_section = f"""
+        <section class="section-group">
+            <h2 class="section-title">🤿 강사진 · {len(instructors_data)}명</h2>
+            <div class="user-list">
+                {create_user_cards(instructors_data, is_instructor=True)}
+            </div>
+        </section>
+        """
+
+    non_insta_section = ""
+    if non_insta_count > 0:
+        non_insta_section = f"""
+        <section class="section-group">
+            <h2 class="section-title">✨ 그 외 함께하는 분들 · {non_insta_count}명</h2>
+            <div class="user-card non-insta-card">
+                <div class="avatar-ring muted">
+                    <img src="assets/default.svg" alt="미참여">
+                </div>
+                <div class="info">
+                    <div class="username">인스타그램 미등록 멤버 <span class="tag">{non_insta_count}명</span></div>
+                    <div class="fullname">인스타그램 계정이 없거나 등록되지 않은 동행 인원입니다</div>
+                </div>
+            </div>
+        </section>
+        """
 
     html = f"""<!DOCTYPE html>
 <html lang="ko">
@@ -229,7 +252,8 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
             --secondary: #efefef;
             --danger: #ed4956;
             --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            --ig-gradient-soft: linear-gradient(135deg, #fde2c4 0%, #fcd0c0 25%, #f8c1d0 50%, #e8c5dc 75%, #d8c2e3 100%);
+            --instructor-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --ig-gradient-soft: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 25%, #fce7f3 50%, #fef3c7 100%);
         }}
 
         * {{
@@ -251,35 +275,35 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
         .container {{
             max-width: 720px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.45);
             backdrop-filter: blur(18px) saturate(160%);
             -webkit-backdrop-filter: blur(18px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 24px;
-            padding: 8px 16px 24px;
-            box-shadow: 0 20px 60px rgba(80, 40, 100, 0.12);
+            padding: 12px 16px 28px;
+            box-shadow: 0 20px 60px rgba(40, 80, 120, 0.12);
         }}
 
         header {{
             text-align: center;
             padding: 28px 24px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.88);
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(14px) saturate(150%);
             -webkit-backdrop-filter: blur(14px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: 20px;
             box-shadow:
-                0 1px 2px rgba(80, 40, 100, 0.06),
-                0 6px 16px rgba(80, 40, 100, 0.08),
-                0 16px 40px rgba(80, 40, 100, 0.06);
+                0 1px 2px rgba(40, 80, 120, 0.06),
+                0 6px 16px rgba(40, 80, 120, 0.08),
+                0 16px 40px rgba(40, 80, 120, 0.06);
         }}
 
         header h1 {{
             font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.02em;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }}
 
         header .subtitle {{
@@ -291,6 +315,8 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
             display: inline-flex;
             gap: 8px;
             margin-top: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
         }}
 
         .stat-item {{
@@ -302,13 +328,24 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
             font-weight: 600;
         }}
 
+        .stat-item.highlight {{
+            background: #e0f2fe;
+            color: #0284c7;
+        }}
+
+        .section-group {{
+            margin-bottom: 24px;
+        }}
+
         .section-title {{
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin: 8px 4px 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #475569;
+            letter-spacing: 0.02em;
+            margin: 12px 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }}
 
         .user-list {{
@@ -320,29 +357,37 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
         .user-card {{
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(14px) saturate(150%);
             -webkit-backdrop-filter: blur(14px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             padding: 12px 14px;
             border-radius: 16px;
             box-shadow:
-                0 1px 2px rgba(80, 40, 100, 0.06),
-                0 6px 16px rgba(80, 40, 100, 0.08),
-                0 16px 40px rgba(80, 40, 100, 0.06);
+                0 1px 2px rgba(40, 80, 120, 0.06),
+                0 4px 12px rgba(40, 80, 120, 0.06);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }}
 
         .user-card:hover {{
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow:
-                0 2px 4px rgba(80, 40, 100, 0.08),
-                0 10px 24px rgba(80, 40, 100, 0.14),
-                0 24px 56px rgba(80, 40, 100, 0.10);
+                0 4px 8px rgba(40, 80, 120, 0.08),
+                0 12px 24px rgba(40, 80, 120, 0.12);
+        }}
+
+        .user-card.instructor-card {{
+            border-left: 4px solid #0284c7;
+            background: rgba(240, 249, 255, 0.92);
+        }}
+
+        .user-card.non-insta-card {{
+            opacity: 0.85;
+            border-style: dashed;
         }}
 
         .user-card.failed {{
-            opacity: 0.6;
+            opacity: 0.65;
         }}
 
         .avatar-ring {{
@@ -355,6 +400,10 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
             display: flex;
             align-items: center;
             justify-content: center;
+        }}
+
+        .avatar-ring.instructor-ring {{
+            background: var(--instructor-gradient);
         }}
 
         .avatar-ring.muted {{
@@ -387,13 +436,17 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
 
         .tag {{
             font-size: 0.65rem;
-            font-weight: 600;
+            font-weight: 700;
             padding: 2px 8px;
             border-radius: 999px;
             background: var(--secondary);
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.02em;
+        }}
+
+        .tag.instructor {{
+            background: #e0f2fe;
+            color: #0369a1;
         }}
 
         .tag.private {{
@@ -442,8 +495,8 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
 
         footer {{
             text-align: center;
-            margin-top: 48px;
-            color: rgba(60, 40, 70, 0.55);
+            margin-top: 40px;
+            color: rgba(60, 80, 100, 0.6);
             font-size: 0.75rem;
         }}
 
@@ -453,7 +506,7 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
             }}
 
             .user-card {{
-                padding: 8px 6px;
+                padding: 10px 10px;
             }}
 
             .avatar-ring {{
@@ -474,17 +527,26 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
             <h1>{heading}</h1>
             <p class="subtitle">마지막 업데이트 · {now}</p>
             <div class="stats">
-                <div class="stat-item">참여자 {total_count}</div>
+                <div class="stat-item highlight">총 인원 {total_count}명</div>
+                <div class="stat-item">강사진 {len(instructors_data)}명</div>
+                <div class="stat-item">참여자 {len(users_data)}명</div>
+                {f'<div class="stat-item">미등록 {non_insta_count}명</div>' if non_insta_count > 0 else ''}
             </div>
         </header>
         <main>
-            <h2 class="section-title">참여자 · {len(users_data)}</h2>
-            <div class="user-list">
-                {create_user_cards(users_data)}
-            </div>
+            {instructors_section}
+
+            <section class="section-group">
+                <h2 class="section-title">👥 참가자 · {len(users_data)}명</h2>
+                <div class="user-list">
+                    {create_user_cards(users_data, is_instructor=False)}
+                </div>
+            </section>
+
+            {non_insta_section}
         </main>
         <footer>
-            <p>Powered by Instagram Follower Tracker</p>
+            <p>10/2 ~ 10/13 Dahab Diving Tour</p>
         </footer>
     </div>
 </body>
@@ -495,7 +557,7 @@ def generate_html(developer_data: list[dict], users_data: list[dict], sponsors_d
 
 def main():
     print("=" * 50)
-    print("🔍 Instagram Follower Tracker")
+    print("🔍 Instagram Follower Tracker (Dahab Edition)")
     print("=" * 50)
     
     # assets 폴더 생성
@@ -506,11 +568,11 @@ def main():
     create_default_image(assets_dir)
     
     # 목록 로드
+    instructors_list = load_users("instructors.txt")
     target_list = load_users("users.txt")
-    # sponsors_list = load_users("sponsors.txt")
-    # developers_list = load_users("developers.txt")
     
-    print(f"\n📋 사용자: {len(target_list)}명\n")
+    print(f"\n📋 강사진: {len(instructors_list)}명")
+    print(f"📋 참가자: {len(target_list)}명\n")
     
     # 환경 변수 로드
     load_dotenv(".env.local")
@@ -536,28 +598,28 @@ def main():
     if os.path.exists(cache_file):
         try:
             with open(cache_file, "r", encoding="utf-8") as f:
-                import json
                 cache = json.load(f)
             print(f"📦 캐시된 데이터 {len(cache)}개를 로드했습니다.")
         except Exception:
             print("⚠️ 캐시 파일 로드 중 오류 발생, 새로 시작합니다.")
             cache = {}
 
+    instructors_data = []
     users_data = []
     sponsors_data = []
-    developer_data = []
-    
-    # # 협찬사 처리
-    # print("\n[1] 협찬사 정보 수집 중...")
-    # for i, username in enumerate(sponsors_list, 1):
-    #     print(f"[{i}/{len(sponsors_list)}] {username} 처리 중...")
-    #     info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
-    #     sponsors_data.append(info)
-    #     if not is_cached:
-    #         time.sleep(5) # 캐시가 아닐 때만 대기
 
-    # 사용자 처리
-    print("\n[1] 사용자 정보 수집 중...")
+    # 1. 강사진 처리
+    if instructors_list:
+        print("\n[1] 강사진 정보 수집 중...")
+        for i, username in enumerate(instructors_list, 1):
+            print(f"[{i}/{len(instructors_list)}] (강사) {username} 처리 중...")
+            info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
+            instructors_data.append(info)
+            if i < len(instructors_list) and not is_cached:
+                time.sleep(5)
+
+    # 2. 일반 참가자 처리
+    print("\n[2] 참가자 정보 수집 중...")
     for i, username in enumerate(target_list, 1):
         print(f"[{i}/{len(target_list)}] {username} 처리 중...")
         info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
@@ -566,35 +628,30 @@ def main():
         # 마지막 요청이 아니면 대기 (캐시 미사용 시에만)
         if i < len(target_list) and not is_cached:
             time.sleep(5)
-    
-    # # 개발자 정보 수집
-    # print("\n[2] 개발자 정보 수집 중...")
-    # for i, username in enumerate(developers_list, 1):
-    #     print(f"[{i}/{len(developers_list)}] {username} 처리 중...")
-    #     info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
-    #     developer_data.append(info)
-    #     if i < len(developers_list) and not is_cached:
-    #         time.sleep(5)
 
     # HTML 생성
     print("\n📝 HTML 파일 생성 중...")
     
-    total_count = len(target_list)  # + len(sponsors_list) + len(developers_list)
-    
     config = load_config("config.json")
-    html_content = generate_html(developer_data, users_data, sponsors_data, total_count, config)
+    non_insta = int(config.get("non_insta_count", 0))
+    total_count = len(instructors_list) + len(target_list) + non_insta
+    
+    html_content = generate_html(instructors_data, users_data, sponsors_data, total_count, config)
     
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
     
     # 결과 요약
-    total_success = sum(1 for u in users_data if u["success"]) + sum(1 for s in sponsors_data if s["success"])
-    total_fail = (len(users_data) + len(sponsors_data)) - total_success
+    total_success = sum(1 for u in instructors_data if u["success"]) + sum(1 for u in users_data if u["success"])
+    total_fail = (len(instructors_data) + len(users_data)) - total_success
     
     print("\n" + "=" * 50)
     print("✨ 완료!")
-    print(f"   - 성공: {total_success}명")
-    print(f"   - 실패: {total_fail}명")
+    print(f"   - 강사진: {len(instructors_data)}명")
+    print(f"   - 참가자: {len(users_data)}명")
+    print(f"   - 미등록: {non_insta}명")
+    print(f"   - 총 인원: {total_count}명")
+    print(f"   - 프로필 수집 성공: {total_success}명 / 실패: {total_fail}명")
     print(f"   - 결과 파일: index.html")
     print(f"   - 이미지 폴더: {assets_dir}/")
     print("=" * 50)
@@ -602,4 +659,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -268,5 +268,23 @@
     "success": true,
     "full_name": "슌글방글 | freediving",
     "is_private": false
+  },
+  "diver_yusin": {
+    "username": "diver_yusin",
+    "success": true,
+    "full_name": "유신 (강사)",
+    "is_private": false
+  },
+  "_sungwo": {
+    "username": "_sungwo",
+    "success": true,
+    "full_name": "성우",
+    "is_private": false
+  },
+  "i_am_tosil": {
+    "username": "i_am_tosil",
+    "success": true,
+    "full_name": "토실",
+    "is_private": false
   }
 }

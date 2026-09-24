@@ -1,50 +1,8 @@
-# Instagram Follower Tracker - 사용자 목록
-# 한 줄에 하나의 사용자명을 입력하세요
-# #으로 시작하는 줄은 주석으로 무시됩니다
-
-# 예시 계정들 (원하는 계정으로 수정하세요)
-@yeoriyeori
-@tsy_0
-@travelerj87
-@kang_iseul_
-@zzv___zzv
-@jieun.lee0000
-@hyukjun___kwon
-@hope_inna
-@jjem_b
-@ahang486
-@hwicook
-@hedge_l
-@grandblue__art
-@heti.0214
-@angela3549
-@leehar1n
-@yunmiokk
-@i_am_jyung
-@naraxxanne
-@j.__.sy
-@simba___two
-@brp0077
-@jihxe
-@imxoo_days
-@_h.eco
-@stella._.sophie
-@ehaera__
-@juyeon210_s2
-@hurancheska
-@jjungoo.world
-@ddddoodii
-@sehee.86
-@jessie_kimm
-@ssun0ee
-@hssu__15
-@mimi__jo__
-@0rindive
-@kkpinktiger
-@giraffdoyeun
-@psycho0628
-@kyoung0728
-@2_eunchu
-@diver_goevia
-@wooki_871224
-@shunglebangle
+# 일반 참가자 목록 (한 줄에 하나의 인스타그램 아이디)
+ahang486
+jieun.lee0000
+_h.eco
+_sungwo
+ssun0ee
+hssu__15
+i_am_tosil
