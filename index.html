@@ -241,7 +241,37 @@
         .action-bar {
             display: flex;
             justify-content: center;
+            gap: 10px;
             margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .schedule-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            border: none;
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(255, 107, 107, 0.28);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .schedule-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.42);
+            color: #ffffff;
+        }
+
+        .schedule-btn:active {
+            transform: translateY(0);
         }
 
         .copy-btn {
@@ -373,7 +403,7 @@
     <div class="container">
         <header>
             <h1>🌊 '26년 이집트 다합 🇪🇬</h1>
-            <p class="subtitle">마지막 업데이트 · 2026-09-25 11:51</p>
+            <p class="subtitle">마지막 업데이트 · 2026-09-25 12:05</p>
             <div class="stats">
                 <div class="stat-item highlight">총 인원 13명</div>
                 <div class="stat-item">강사진 2명</div>
@@ -382,6 +412,12 @@
                 <div class="stat-item">다이빙 센터 1곳</div>
             </div>
             <div class="action-bar">
+                
+                <a href="https://wanderlog.com/view/ymfrayiywt/calm-in-dahab/shared" target="_blank" rel="noopener" class="schedule-btn">
+                    <span class="btn-icon">🗺️</span>
+                    <span class="btn-text">여행 일정 보기</span>
+                </a>
+    
                 <button class="copy-btn" id="copyTagsBtn" onclick="copyTags()">
                     <span class="btn-icon">📋</span>
                     <span class="btn-text">태그용 아이디 복사</span>

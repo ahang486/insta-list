@@ -172,6 +172,14 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
     title = config.get("title", "Insta List")
     heading = config.get("heading", title)
     non_insta_count = int(config.get("non_insta_count", 0))
+    schedule_url = config.get("schedule_url", "")
+
+    schedule_btn_html = f"""
+                <a href="{schedule_url}" target="_blank" rel="noopener" class="schedule-btn">
+                    <span class="btn-icon">🗺️</span>
+                    <span class="btn-text">여행 일정 보기</span>
+                </a>
+    """ if schedule_url else ""
 
     # 복사할 태그 텍스트 생성 (@username 목록)
     all_tag_users = []
@@ -514,7 +522,37 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
         .action-bar {{
             display: flex;
             justify-content: center;
+            gap: 10px;
             margin-top: 16px;
+            flex-wrap: wrap;
+        }}
+
+        .schedule-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            border: none;
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(255, 107, 107, 0.28);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }}
+
+        .schedule-btn:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.42);
+            color: #ffffff;
+        }}
+
+        .schedule-btn:active {{
+            transform: translateY(0);
         }}
 
         .copy-btn {{
@@ -655,6 +693,7 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
                 {f'<div class="stat-item">다이빙 센터 {len(centers_data)}곳</div>' if centers_data else ''}
             </div>
             <div class="action-bar">
+                {schedule_btn_html}
                 <button class="copy-btn" id="copyTagsBtn" onclick="copyTags()">
                     <span class="btn-icon">📋</span>
                     <span class="btn-text">태그용 아이디 복사</span>
