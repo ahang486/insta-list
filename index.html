@@ -17,6 +17,7 @@
             --danger: #ed4956;
             --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             --instructor-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --center-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --ig-gradient-soft: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 25%, #fce7f3 50%, #fef3c7 100%);
         }
 
@@ -145,6 +146,11 @@
             background: rgba(240, 249, 255, 0.92);
         }
 
+        .user-card.center-card {
+            border-left: 4px solid #059669;
+            background: rgba(240, 253, 250, 0.92);
+        }
+
         .user-card.non-insta-card {
             opacity: 0.85;
             border-style: dashed;
@@ -168,6 +174,10 @@
 
         .avatar-ring.instructor-ring {
             background: var(--instructor-gradient);
+        }
+
+        .avatar-ring.center-ring {
+            background: var(--center-gradient);
         }
 
         .avatar-ring.muted {
@@ -213,6 +223,11 @@
             color: #0369a1;
         }
 
+        .tag.center {
+            background: #ccfbf1;
+            color: #0f766e;
+        }
+
         .tag.private {
             background: #fff0f0;
             color: var(--danger);
@@ -221,6 +236,75 @@
         .tag.failed {
             background: var(--secondary);
             color: var(--text-muted);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 149, 246, 0.35);
+            color: #0095f6;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.12);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-family: inherit;
+        }
+
+        .copy-btn:hover {
+            background: #0095f6;
+            color: #ffffff;
+            border-color: #0095f6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 149, 246, 0.28);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+            color: #ffffff;
+            border-color: #10b981;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(15, 23, 42, 0.92);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
 
         .fullname {
@@ -289,12 +373,19 @@
     <div class="container">
         <header>
             <h1>🌊 '26년 이집트 다합 🇪🇬</h1>
-            <p class="subtitle">마지막 업데이트 · 2026-09-24 16:53</p>
+            <p class="subtitle">마지막 업데이트 · 2026-09-25 02:25</p>
             <div class="stats">
                 <div class="stat-item highlight">총 인원 13명</div>
                 <div class="stat-item">강사진 2명</div>
                 <div class="stat-item">참여자 7명</div>
                 <div class="stat-item">미등록 4명</div>
+                
+            </div>
+            <div class="action-bar">
+                <button class="copy-btn" id="copyTagsBtn" onclick="copyTags()">
+                    <span class="btn-icon">📋</span>
+                    <span class="btn-text">태그용 아이디 복사</span>
+                </button>
             </div>
         </header>
         <main>
@@ -414,6 +505,8 @@
             </section>
 
             
+
+            
         <section class="section-group">
             <h2 class="section-title">✨ 그 외 함께하는 분들 · 4명</h2>
             <div class="user-card non-insta-card">
@@ -432,5 +525,54 @@
             <p>10/2 ~ 10/13 Dahab Diving Tour</p>
         </footer>
     </div>
+    <div id="toast" class="toast">✨ 전체 태그가 복사되었습니다!</div>
+    <script>
+        const TAG_TEXT = "@jjungoo.world\n@diver_yusin\n@ahang486\n@jieun.lee0000\n@_h.eco\n@_sungwo\n@ssun0ee\n@hssu__15\n@i_am_tosil";
+
+        function copyTags() {
+            const btn = document.getElementById('copyTagsBtn');
+            const btnText = btn.querySelector('.btn-text');
+            const btnIcon = btn.querySelector('.btn-icon');
+            const toast = document.getElementById('toast');
+
+            function onSuccess() {
+                btn.classList.add('copied');
+                btnIcon.textContent = '✅';
+                btnText.textContent = '복사 완료!';
+                if (toast) {
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                }
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btnIcon.textContent = '📋';
+                    btnText.textContent = '태그용 아이디 복사';
+                }, 2000);
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(TAG_TEXT).then(onSuccess).catch(() => fallbackCopy());
+            } else {
+                fallbackCopy();
+            }
+
+            function fallbackCopy() {
+                const textArea = document.createElement('textarea');
+                textArea.value = TAG_TEXT;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    onSuccess();
+                } catch (err) {
+                    alert('복사에 실패했습니다.');
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+    </script>
 </body>
 </html>

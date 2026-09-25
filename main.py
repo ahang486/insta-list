@@ -164,24 +164,49 @@ def load_config(filepath: str = "config.json") -> dict:
         return defaults
 
 
-def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors_data: list[dict], total_count: int, config: dict) -> str:
+def generate_html(instructors_data: list[dict], users_data: list[dict], centers_data: list[dict], total_count: int, config: dict) -> str:
     """HTML 컨텐츠를 생성합니다."""
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     title = config.get("title", "Insta List")
     heading = config.get("heading", title)
     non_insta_count = int(config.get("non_insta_count", 0))
+
+    # 복사할 태그 텍스트 생성 (@username 목록)
+    all_tag_users = []
+    for u in instructors_data:
+        if u.get("username"):
+            all_tag_users.append(f"@{u['username']}")
+    for u in users_data:
+        if u.get("username"):
+            all_tag_users.append(f"@{u['username']}")
+    for u in centers_data:
+        if u.get("username"):
+            all_tag_users.append(f"@{u['username']}")
+    tag_text_js = json.dumps("\n".join(all_tag_users))
     
     # 사용자 카드 HTML 생성 헬퍼 함수
-    def create_user_cards(data_list, is_instructor=False):
+    def create_user_cards(data_list, role=""):
         cards_html = ""
         for user in data_list:
-            role_badge = '<span class="tag instructor">강사</span>' if is_instructor else ''
+            if role == "instructor":
+                role_badge = '<span class="tag instructor">강사</span>'
+                card_class = "instructor-card"
+                ring_class = "instructor-ring"
+            elif role == "center":
+                role_badge = '<span class="tag center">다이빙 센터</span>'
+                card_class = "center-card"
+                ring_class = "center-ring"
+            else:
+                role_badge = ""
+                card_class = ""
+                ring_class = ""
+
             if user["success"]:
                 privacy_tag = '<span class="tag private">비공개</span>' if user["is_private"] else ''
                 cards_html += f"""
-                <div class="user-card {'instructor-card' if is_instructor else ''}">
-                    <div class="avatar-ring {'instructor-ring' if is_instructor else ''}">
+                <div class="user-card {card_class}">
+                    <div class="avatar-ring {ring_class}">
                         <img src="assets/{user['username']}.jpg" onerror="this.src='assets/default.svg'" alt="{user['username']}">
                     </div>
                     <div class="info">
@@ -193,7 +218,7 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
     """
             else:
                 cards_html += f"""
-                <div class="user-card failed {'instructor-card' if is_instructor else ''}">
+                <div class="user-card failed {card_class}">
                     <div class="avatar-ring muted">
                         <img src="assets/default.svg" alt="{user['username']}">
                     </div>
@@ -212,7 +237,18 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
         <section class="section-group">
             <h2 class="section-title">🤿 강사진 · {len(instructors_data)}명</h2>
             <div class="user-list">
-                {create_user_cards(instructors_data, is_instructor=True)}
+                {create_user_cards(instructors_data, role="instructor")}
+            </div>
+        </section>
+        """
+
+    centers_section = ""
+    if centers_data:
+        centers_section = f"""
+        <section class="section-group">
+            <h2 class="section-title">🏢 다이빙 센터 · {len(centers_data)}곳</h2>
+            <div class="user-list">
+                {create_user_cards(centers_data, role="center")}
             </div>
         </section>
         """
@@ -253,6 +289,7 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
             --danger: #ed4956;
             --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             --instructor-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --center-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --ig-gradient-soft: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 25%, #fce7f3 50%, #fef3c7 100%);
         }}
 
@@ -381,6 +418,11 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
             background: rgba(240, 249, 255, 0.92);
         }}
 
+        .user-card.center-card {{
+            border-left: 4px solid #059669;
+            background: rgba(240, 253, 250, 0.92);
+        }}
+
         .user-card.non-insta-card {{
             opacity: 0.85;
             border-style: dashed;
@@ -404,6 +446,10 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
 
         .avatar-ring.instructor-ring {{
             background: var(--instructor-gradient);
+        }}
+
+        .avatar-ring.center-ring {{
+            background: var(--center-gradient);
         }}
 
         .avatar-ring.muted {{
@@ -449,6 +495,11 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
             color: #0369a1;
         }}
 
+        .tag.center {{
+            background: #ccfbf1;
+            color: #0f766e;
+        }}
+
         .tag.private {{
             background: #fff0f0;
             color: var(--danger);
@@ -457,6 +508,75 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
         .tag.failed {{
             background: var(--secondary);
             color: var(--text-muted);
+        }}
+
+        .action-bar {{
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+        }}
+
+        .copy-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 149, 246, 0.35);
+            color: #0095f6;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.12);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-family: inherit;
+        }}
+
+        .copy-btn:hover {{
+            background: #0095f6;
+            color: #ffffff;
+            border-color: #0095f6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 149, 246, 0.28);
+        }}
+
+        .copy-btn:active {{
+            transform: translateY(0);
+        }}
+
+        .copy-btn.copied {{
+            background: #10b981;
+            color: #ffffff;
+            border-color: #10b981;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }}
+
+        .toast {{
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(15, 23, 42, 0.92);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }}
+
+        .toast.show {{
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }}
 
         .fullname {{
@@ -531,6 +651,13 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
                 <div class="stat-item">강사진 {len(instructors_data)}명</div>
                 <div class="stat-item">참여자 {len(users_data)}명</div>
                 {f'<div class="stat-item">미등록 {non_insta_count}명</div>' if non_insta_count > 0 else ''}
+                {f'<div class="stat-item">다이빙 센터 {len(centers_data)}곳</div>' if centers_data else ''}
+            </div>
+            <div class="action-bar">
+                <button class="copy-btn" id="copyTagsBtn" onclick="copyTags()">
+                    <span class="btn-icon">📋</span>
+                    <span class="btn-text">태그용 아이디 복사</span>
+                </button>
             </div>
         </header>
         <main>
@@ -539,9 +666,11 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
             <section class="section-group">
                 <h2 class="section-title">👥 참가자 · {len(users_data)}명</h2>
                 <div class="user-list">
-                    {create_user_cards(users_data, is_instructor=False)}
+                    {create_user_cards(users_data, role="")}
                 </div>
             </section>
+
+            {centers_section}
 
             {non_insta_section}
         </main>
@@ -549,6 +678,55 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], sponsors
             <p>10/2 ~ 10/13 Dahab Diving Tour</p>
         </footer>
     </div>
+    <div id="toast" class="toast">✨ 전체 태그가 복사되었습니다!</div>
+    <script>
+        const TAG_TEXT = {tag_text_js};
+
+        function copyTags() {{
+            const btn = document.getElementById('copyTagsBtn');
+            const btnText = btn.querySelector('.btn-text');
+            const btnIcon = btn.querySelector('.btn-icon');
+            const toast = document.getElementById('toast');
+
+            function onSuccess() {{
+                btn.classList.add('copied');
+                btnIcon.textContent = '✅';
+                btnText.textContent = '복사 완료!';
+                if (toast) {{
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                }}
+                setTimeout(() => {{
+                    btn.classList.remove('copied');
+                    btnIcon.textContent = '📋';
+                    btnText.textContent = '태그용 아이디 복사';
+                }}, 2000);
+            }}
+
+            if (navigator.clipboard && window.isSecureContext) {{
+                navigator.clipboard.writeText(TAG_TEXT).then(onSuccess).catch(() => fallbackCopy());
+            }} else {{
+                fallbackCopy();
+            }}
+
+            function fallbackCopy() {{
+                const textArea = document.createElement('textarea');
+                textArea.value = TAG_TEXT;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {{
+                    document.execCommand('copy');
+                    onSuccess();
+                }} catch (err) {{
+                    alert('복사에 실패했습니다.');
+                }}
+                document.body.removeChild(textArea);
+            }}
+        }}
+    </script>
 </body>
 </html>
 """
@@ -570,9 +748,13 @@ def main():
     # 목록 로드
     instructors_list = load_users("instructors.txt")
     target_list = load_users("users.txt")
+    centers_list = load_users("centers.txt")
     
     print(f"\n📋 강사진: {len(instructors_list)}명")
-    print(f"📋 참가자: {len(target_list)}명\n")
+    print(f"📋 참가자: {len(target_list)}명")
+    if centers_list:
+        print(f"📋 다이빙 센터: {len(centers_list)}곳")
+    print()
     
     # 환경 변수 로드
     load_dotenv(".env.local")
@@ -606,6 +788,7 @@ def main():
 
     instructors_data = []
     users_data = []
+    centers_data = []
     sponsors_data = []
 
     # 1. 강사진 처리
@@ -629,6 +812,16 @@ def main():
         if i < len(target_list) and not is_cached:
             time.sleep(5)
 
+    # 3. 다이빙 센터 처리
+    if centers_list:
+        print("\n[3] 다이빙 센터 정보 수집 중...")
+        for i, username in enumerate(centers_list, 1):
+            print(f"[{i}/{len(centers_list)}] (센터) {username} 처리 중...")
+            info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
+            centers_data.append(info)
+            if i < len(centers_list) and not is_cached:
+                time.sleep(5)
+
     # HTML 생성
     print("\n📝 HTML 파일 생성 중...")
     
@@ -636,19 +829,21 @@ def main():
     non_insta = int(config.get("non_insta_count", 0))
     total_count = len(instructors_list) + len(target_list) + non_insta
     
-    html_content = generate_html(instructors_data, users_data, sponsors_data, total_count, config)
+    html_content = generate_html(instructors_data, users_data, centers_data, total_count, config)
     
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
     
     # 결과 요약
-    total_success = sum(1 for u in instructors_data if u["success"]) + sum(1 for u in users_data if u["success"])
-    total_fail = (len(instructors_data) + len(users_data)) - total_success
+    total_success = sum(1 for u in instructors_data if u["success"]) + sum(1 for u in users_data if u["success"]) + sum(1 for u in centers_data if u["success"])
+    total_fail = (len(instructors_data) + len(users_data) + len(centers_data)) - total_success
     
     print("\n" + "=" * 50)
     print("✨ 완료!")
     print(f"   - 강사진: {len(instructors_data)}명")
     print(f"   - 참가자: {len(users_data)}명")
+    if centers_data:
+        print(f"   - 다이빙 센터: {len(centers_data)}곳")
     print(f"   - 미등록: {non_insta}명")
     print(f"   - 총 인원: {total_count}명")
     print(f"   - 프로필 수집 성공: {total_success}명 / 실패: {total_fail}명")
