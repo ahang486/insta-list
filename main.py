@@ -262,23 +262,6 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
         </section>
         """
 
-    non_insta_section = ""
-    if non_insta_count > 0:
-        non_insta_section = f"""
-        <section class="section-group">
-            <h2 class="section-title">✨ 그 외 함께하는 분들 · {non_insta_count}명</h2>
-            <div class="user-card non-insta-card">
-                <div class="avatar-ring muted">
-                    <img src="assets/default.svg" alt="미참여">
-                </div>
-                <div class="info">
-                    <div class="username">인스타그램 미등록 멤버 <span class="tag">{non_insta_count}명</span></div>
-                    <div class="fullname">인스타그램 계정이 없거나 등록되지 않은 동행 인원입니다</div>
-                </div>
-            </div>
-        </section>
-        """
-
     html = f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -685,13 +668,6 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
         <header>
             <h1>{heading}</h1>
             <p class="subtitle">마지막 업데이트 · {now}</p>
-            <div class="stats">
-                <div class="stat-item highlight">총 인원 {total_count}명</div>
-                <div class="stat-item">강사진 {len(instructors_data)}명</div>
-                <div class="stat-item">참여자 {len(users_data)}명</div>
-                {f'<div class="stat-item">미등록 {non_insta_count}명</div>' if non_insta_count > 0 else ''}
-                {f'<div class="stat-item">다이빙 센터 {len(centers_data)}곳</div>' if centers_data else ''}
-            </div>
             <div class="action-bar">
                 {schedule_btn_html}
                 <button class="copy-btn" id="copyTagsBtn" onclick="copyTags()">
@@ -711,8 +687,6 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
             </section>
 
             {centers_section}
-
-            {non_insta_section}
         </main>
         <footer>
             <p>10/2 ~ 10/13 Dahab Diving Tour</p>
