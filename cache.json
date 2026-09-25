@@ -292,5 +292,23 @@
     "success": true,
     "full_name": "캄인블루 서울/울릉도 프리다이빙센터",
     "is_private": false
+  },
+  "jvliehong": {
+    "username": "jvliehong",
+    "success": true,
+    "full_name": "홍둘리",
+    "is_private": false
+  },
+  "na_s2aem": {
+    "username": "na_s2aem",
+    "success": true,
+    "full_name": "christina",
+    "is_private": false
+  },
+  "_aiden_young": {
+    "username": "_aiden_young",
+    "success": true,
+    "full_name": "",
+    "is_private": false
   }
 }
