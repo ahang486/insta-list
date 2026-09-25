@@ -762,7 +762,7 @@ def main():
     ig_password = os.getenv("IG_PASSWORD")
 
     # Instaloader 인스턴스 생성
-    L = instaloader.Instaloader()
+    L = instaloader.Instaloader(max_connection_attempts=1)
     
     if ig_username and ig_password and ig_username != "your_username_here":
         try:

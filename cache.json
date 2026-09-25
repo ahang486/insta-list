@@ -286,5 +286,11 @@
     "success": true,
     "full_name": "토실",
     "is_private": false
+  },
+  "calm_in_blue_freediving": {
+    "username": "calm_in_blue_freediving",
+    "success": true,
+    "full_name": "캄인블루 서울/울릉도 프리다이빙센터",
+    "is_private": false
   }
 }
