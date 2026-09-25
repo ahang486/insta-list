@@ -164,14 +164,14 @@ def load_config(filepath: str = "config.json") -> dict:
         return defaults
 
 
-def generate_html(instructors_data: list[dict], users_data: list[dict], centers_data: list[dict], total_count: int, config: dict) -> str:
+def generate_html(instructors_data: list[dict], users_data: list[dict], centers_data: list[dict], config: dict) -> str:
     """HTML 컨텐츠를 생성합니다."""
 
     kst = timezone(timedelta(hours=9))
     now = datetime.now(kst).strftime("%Y-%m-%d %H:%M")
     title = config.get("title", "Insta List")
     heading = config.get("heading", title)
-    non_insta_count = int(config.get("non_insta_count", 0))
+    non_insta_count = int(config.get("non_insta_count", 0))  # (참고용, 페이지에는 표시 안 함)
     schedule_url = config.get("schedule_url", "")
 
     schedule_btn_html = f"""
@@ -840,10 +840,8 @@ def main():
     print("\n📝 HTML 파일 생성 중...")
     
     config = load_config("config.json")
-    non_insta = int(config.get("non_insta_count", 0))
-    total_count = len(instructors_list) + len(target_list) + non_insta
-    
-    html_content = generate_html(instructors_data, users_data, centers_data, total_count, config)
+
+    html_content = generate_html(instructors_data, users_data, centers_data, config)
     
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
@@ -858,8 +856,6 @@ def main():
     print(f"   - 참가자: {len(users_data)}명")
     if centers_data:
         print(f"   - 다이빙 센터: {len(centers_data)}곳")
-    print(f"   - 미등록: {non_insta}명")
-    print(f"   - 총 인원: {total_count}명")
     print(f"   - 프로필 수집 성공: {total_success}명 / 실패: {total_fail}명")
     print(f"   - 결과 파일: index.html")
     print(f"   - 이미지 폴더: {assets_dir}/")
