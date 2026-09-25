@@ -11,7 +11,7 @@ import requests
 import time
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -167,7 +167,8 @@ def load_config(filepath: str = "config.json") -> dict:
 def generate_html(instructors_data: list[dict], users_data: list[dict], centers_data: list[dict], total_count: int, config: dict) -> str:
     """HTML 컨텐츠를 생성합니다."""
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    kst = timezone(timedelta(hours=9))
+    now = datetime.now(kst).strftime("%Y-%m-%d %H:%M")
     title = config.get("title", "Insta List")
     heading = config.get("heading", title)
     non_insta_count = int(config.get("non_insta_count", 0))
