@@ -187,7 +187,7 @@ def load_config(filepath: str = "config.json") -> dict:
         return defaults
 
 
-def generate_html(instructors_data: list[dict], users_data: list[dict], centers_data: list[dict], config: dict) -> str:
+def generate_html(instructors_data: list[dict], users_data: list[dict], centers_data: list[dict], config: dict, event_dir: str = "") -> str:
     """HTML 컨텐츠를 생성합니다."""
 
     kst = timezone(timedelta(hours=9))
@@ -201,6 +201,11 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
     # 크루 공식 계정: 카드는 포함하되, 참가자 인원수 카운트에서는 제외
     crew_id = config.get("crew_id", "").lstrip("@")
     member_count = len([u for u in users_data if u.get("username") != crew_id])
+
+    # url 미리보기(og:image)용 대표 이미지: 크루 계정 있으면 크루 로고, 없으면 첫 멤버
+    og_image = f"{crew_id}.jpg" if crew_id else "default.svg"
+    _sub = event_dir.replace("events/", "", 1) if event_dir else ""
+    og_url = f"{os.environ.get('PAGES_BASE', 'https://ahang486.github.io/insta-list').rstrip('/')}/{'events/' + _sub if _sub else ''}"
 
     schedule_btn_html = f"""
                 <a href="{schedule_url}" target="_blank" rel="noopener" class="schedule-btn">
@@ -324,6 +329,10 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
+    <meta property="og:title" content="{title}">
+    <meta property="og:image" content="{assets_prefix}/{og_image}">
+    <meta property="og:url" content="{og_url}">
+    <meta property="og:type" content="website">
     <style>
         :root {{
             --bg: #fafafa;
@@ -911,7 +920,7 @@ def main():
     
     config = load_config(os.path.join(base, "config.json"))
 
-    html_content = generate_html(instructors_data, users_data, centers_data, config)
+    html_content = generate_html(instructors_data, users_data, centers_data, config, event_dir)
     
     out_path = os.path.join(base, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
