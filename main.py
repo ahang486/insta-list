@@ -230,6 +230,10 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
                 role_badge = '<span class="tag center">다이빙 센터</span>'
                 card_class = "center-card"
                 ring_class = "center-ring"
+            elif role == "crew":
+                role_badge = '<span class="tag center">크루</span>'
+                card_class = "center-card"
+                ring_class = "center-ring"
             else:
                 role_badge = ""
                 card_class = ""
@@ -244,7 +248,7 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
                         <img src="{assets_prefix}/default.svg" alt="{name}">
                     </div>
                     <div class="info">
-                        <div class="username">{name}{role_badge}<span class="tag center">크루</span></div>
+                        <div class="username">{name}{role_badge}</div>
                         <div class="fullname">{user.get('full_name') or '&nbsp;'}</div>
                     </div>
                 </div>
@@ -296,6 +300,20 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
             <h2 class="section-title">🏢 다이빙 센터 · {len(centers_data)}곳</h2>
             <div class="user-list">
                 {create_user_cards(centers_data, role="center")}
+            </div>
+        </section>
+        """
+
+    # 크루 공식 계정 섹션 (참가자와 분리)
+    crew_section = ""
+    if crew_id:
+        crew_entries = [u for u in users_data if u.get("username") == crew_id]
+        if crew_entries:
+            crew_section = f"""
+        <section class="section-group">
+            <h2 class="section-title">🏃 크루 · {len(crew_entries)}개</h2>
+            <div class="user-list">
+                {create_user_cards(crew_entries, role="crew")}
             </div>
         </section>
         """
@@ -720,9 +738,11 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
             <section class="section-group">
                 <h2 class="section-title">👥 참가자 · {member_count}명</h2>
                 <div class="user-list">
-                    {create_user_cards(users_data, role="")}
+                    {create_user_cards([u for u in users_data if u.get("username") != crew_id], role="")}
                 </div>
             </section>
+
+            {crew_section}
 
             {centers_section}
         </main>
