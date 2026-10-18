@@ -3,652 +3,95 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>'26년 이집트 다합</title>
+    <title>Insta List — 모임 목록</title>
     <style>
         :root {
             --bg: #fafafa;
-            --surface: #ffffff;
-            --border: #dbdbdb;
             --text: #262626;
             --text-muted: #8e8e8e;
-            --primary: #0095f6;
-            --primary-hover: #1877f2;
-            --secondary: #efefef;
-            --danger: #ed4956;
             --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            --instructor-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
-            --center-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --ig-gradient-soft: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 25%, #fce7f3 50%, #fef3c7 100%);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Noto Sans KR", Roboto, sans-serif;
             background: var(--ig-gradient-soft);
             background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
-            padding: 32px 16px 64px;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(18px) saturate(160%);
-            -webkit-backdrop-filter: blur(18px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 24px;
-            padding: 12px 16px 28px;
-            box-shadow: 0 20px 60px rgba(40, 80, 120, 0.12);
-        }
-
-        header {
-            text-align: center;
-            padding: 28px 24px;
-            margin-bottom: 24px;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(14px) saturate(150%);
-            -webkit-backdrop-filter: blur(14px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            border-radius: 20px;
-            box-shadow:
-                0 1px 2px rgba(40, 80, 120, 0.06),
-                0 6px 16px rgba(40, 80, 120, 0.08),
-                0 16px 40px rgba(40, 80, 120, 0.06);
-        }
-
-        header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 8px;
-        }
-
-        header .subtitle {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .stats {
-            display: inline-flex;
-            gap: 8px;
-            margin-top: 14px;
-            flex-wrap: wrap;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            padding: 24px 16px;
         }
-
-        .stat-item {
-            background: var(--secondary);
-            color: var(--text);
-            padding: 6px 14px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .stat-item.highlight {
-            background: #e0f2fe;
-            color: #0284c7;
-        }
-
-        .section-group {
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #475569;
-            letter-spacing: 0.02em;
-            margin: 12px 6px 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .user-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .user-card {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(14px) saturate(150%);
-            -webkit-backdrop-filter: blur(14px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            padding: 12px 14px;
-            border-radius: 16px;
-            box-shadow:
-                0 1px 2px rgba(40, 80, 120, 0.06),
-                0 4px 12px rgba(40, 80, 120, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .user-card:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 4px 8px rgba(40, 80, 120, 0.08),
-                0 12px 24px rgba(40, 80, 120, 0.12);
-        }
-
-        .user-card.instructor-card {
-            border-left: 4px solid #0284c7;
-            background: rgba(240, 249, 255, 0.92);
-        }
-
-        .user-card.center-card {
-            border-left: 4px solid #059669;
-            background: rgba(240, 253, 250, 0.92);
-        }
-
-        .user-card.non-insta-card {
-            opacity: 0.85;
-            border-style: dashed;
-        }
-
-        .user-card.failed {
-            opacity: 0.65;
-        }
-
-        .avatar-ring {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            padding: 2px;
+        .wrap { max-width: 520px; width: 100%; }
+        header { text-align: center; margin-bottom: 28px; }
+        header .logo {
+            width: 64px; height: 64px; border-radius: 18px;
             background: var(--ig-gradient);
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 32px; margin-bottom: 14px;
+            box-shadow: 0 8px 24px rgba(220, 39, 67, 0.25);
         }
-
-        .avatar-ring.instructor-ring {
-            background: var(--instructor-gradient);
-        }
-
-        .avatar-ring.center-ring {
-            background: var(--center-gradient);
-        }
-
-        .avatar-ring.muted {
-            background: var(--border);
-        }
-
-        .avatar-ring img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--surface);
-            background: var(--surface);
-        }
-
-        .info {
-            flex-grow: 1;
-            margin-left: 12px;
-            min-width: 0;
-        }
-
-        .username {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tag {
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 999px;
-            background: var(--secondary);
-            color: var(--text-muted);
-            letter-spacing: 0.02em;
-        }
-
-        .tag.instructor {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
-
-        .tag.center {
-            background: #ccfbf1;
-            color: #0f766e;
-        }
-
-        .tag.private {
-            background: #fff0f0;
-            color: var(--danger);
-        }
-
-        .tag.failed {
-            background: var(--secondary);
-            color: var(--text-muted);
-        }
-
-        .action-bar {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-
-        .schedule-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
-            border: none;
-            color: #ffffff;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 8px 18px;
-            border-radius: 999px;
-            text-decoration: none;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(255, 107, 107, 0.28);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            font-family: inherit;
-        }
-
-        .schedule-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.42);
-            color: #ffffff;
-        }
-
-        .schedule-btn:active {
-            transform: translateY(0);
-        }
-
-        .copy-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(0, 149, 246, 0.35);
-            color: #0095f6;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 8px 18px;
-            border-radius: 999px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.12);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        header h1 { font-size: 1.5rem; margin-bottom: 6px; }
+        header p { color: var(--text-muted); font-size: 0.9rem; }
+        .event-card {
+            display: flex; align-items: center; gap: 16px;
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            font-family: inherit;
-        }
-
-        .copy-btn:hover {
-            background: #0095f6;
-            color: #ffffff;
-            border-color: #0095f6;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0, 149, 246, 0.28);
-        }
-
-        .copy-btn:active {
-            transform: translateY(0);
-        }
-
-        .copy-btn.copied {
-            background: #10b981;
-            color: #ffffff;
-            border-color: #10b981;
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(15, 23, 42, 0.92);
-            color: #ffffff;
-            padding: 10px 22px;
-            border-radius: 999px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(12px);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1000;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .fullname {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .btn {
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 18px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
             text-decoration: none;
-            background: var(--primary);
-            color: white;
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-            transition: background-color 0.15s ease;
-        }
-
-        .btn:hover {
-            background: var(--primary-hover);
-        }
-
-        .btn.secondary {
-            background: var(--secondary);
             color: var(--text);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
         }
-
-        .btn.secondary:hover {
-            background: #e5e5e5;
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
         }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: rgba(60, 80, 100, 0.6);
-            font-size: 0.75rem;
+        .event-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 26px; flex-shrink: 0;
         }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 16px 8px 48px;
-            }
-
-            .user-card {
-                padding: 10px 10px;
-            }
-
-            .avatar-ring {
-                width: 48px;
-                height: 48px;
-            }
-
-            .btn {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-            }
-        }
+        .event-icon.dive { background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); }
+        .event-icon.run  { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .event-info { flex: 1; min-width: 0; }
+        .event-name { font-weight: 700; font-size: 1.05rem; margin-bottom: 3px; display: block; }
+        .event-desc { color: var(--text-muted); font-size: 0.82rem; display: block; }
+        .arrow { color: var(--text-muted); font-size: 1.2rem; flex-shrink: 0; }
+        footer { text-align: center; margin-top: 30px; color: rgba(60, 80, 100, 0.6); font-size: 0.75rem; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="wrap">
         <header>
-            <h1>🌊 '26년 이집트 다합 🇪🇬</h1>
-            <p class="subtitle">마지막 업데이트 · 2026-09-25 14:05</p>
-            <div class="action-bar">
-                
-                <a href="https://wanderlog.com/view/ymfrayiywt/calm-in-dahab/shared" target="_blank" rel="noopener" class="schedule-btn">
-                    <span class="btn-icon">🗺️</span>
-                    <span class="btn-text">여행 일정 보기</span>
-                </a>
-    
-                <button class="copy-btn" id="copyTagsBtn" onclick="copyTags()">
-                    <span class="btn-icon">📋</span>
-                    <span class="btn-text">태그용 아이디 복사</span>
-                </button>
-            </div>
+            <div class="logo">📸</div>
+            <h1>Insta List</h1>
+            <p>모임별 인스타그램 멤버 리스트</p>
         </header>
         <main>
-            
-        <section class="section-group">
-            <h2 class="section-title">🤿 강사진 · 2명</h2>
-            <div class="user-list">
-                
-                <div class="user-card instructor-card">
-                    <div class="avatar-ring instructor-ring">
-                        <img src="assets/jjungoo.world.jpg" onerror="this.src='assets/default.svg'" alt="jjungoo.world">
-                    </div>
-                    <div class="info">
-                        <div class="username">jjungoo.world<span class="tag instructor">강사</span></div>
-                        <div class="fullname">전성호(BP) / 캄인블루프리다이빙 대표</div>
-                    </div>
-                    <a href="https://www.instagram.com/jjungoo.world/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card instructor-card">
-                    <div class="avatar-ring instructor-ring">
-                        <img src="assets/diver_yusin.jpg" onerror="this.src='assets/default.svg'" alt="diver_yusin">
-                    </div>
-                    <div class="info">
-                        <div class="username">diver_yusin<span class="tag instructor">강사</span></div>
-                        <div class="fullname">유신</div>
-                    </div>
-                    <a href="https://www.instagram.com/diver_yusin/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-            </div>
-        </section>
-        
-
-            <section class="section-group">
-                <h2 class="section-title">👥 참가자 · 11명</h2>
-                <div class="user-list">
-                    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/ahang486.jpg" onerror="this.src='assets/default.svg'" alt="ahang486">
-                    </div>
-                    <div class="info">
-                        <div class="username">ahang486</div>
-                        <div class="fullname">박성열</div>
-                    </div>
-                    <a href="https://www.instagram.com/ahang486/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/jieun.lee0000.jpg" onerror="this.src='assets/default.svg'" alt="jieun.lee0000">
-                    </div>
-                    <div class="info">
-                        <div class="username">jieun.lee0000</div>
-                        <div class="fullname">&nbsp;</div>
-                    </div>
-                    <a href="https://www.instagram.com/jieun.lee0000/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/_h.eco.jpg" onerror="this.src='assets/default.svg'" alt="_h.eco">
-                    </div>
-                    <div class="info">
-                        <div class="username">_h.eco</div>
-                        <div class="fullname">해코</div>
-                    </div>
-                    <a href="https://www.instagram.com/_h.eco/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/_sungwo.jpg" onerror="this.src='assets/default.svg'" alt="_sungwo">
-                    </div>
-                    <div class="info">
-                        <div class="username">_sungwo</div>
-                        <div class="fullname">Sungwoo Park</div>
-                    </div>
-                    <a href="https://www.instagram.com/_sungwo/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/ssun0ee.jpg" onerror="this.src='assets/default.svg'" alt="ssun0ee">
-                    </div>
-                    <div class="info">
-                        <div class="username">ssun0ee</div>
-                        <div class="fullname">박선영</div>
-                    </div>
-                    <a href="https://www.instagram.com/ssun0ee/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/hssu__15.jpg" onerror="this.src='assets/default.svg'" alt="hssu__15">
-                    </div>
-                    <div class="info">
-                        <div class="username">hssu__15</div>
-                        <div class="fullname">&nbsp;</div>
-                    </div>
-                    <a href="https://www.instagram.com/hssu__15/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/i_am_tosil.jpg" onerror="this.src='assets/default.svg'" alt="i_am_tosil">
-                    </div>
-                    <div class="info">
-                        <div class="username">i_am_tosil<span class="tag private">비공개</span></div>
-                        <div class="fullname">토실</div>
-                    </div>
-                    <a href="https://www.instagram.com/i_am_tosil/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/jvliehong.jpg" onerror="this.src='assets/default.svg'" alt="jvliehong">
-                    </div>
-                    <div class="info">
-                        <div class="username">jvliehong</div>
-                        <div class="fullname">홍둘리</div>
-                    </div>
-                    <a href="https://www.instagram.com/jvliehong/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/_aidenyoon.jpg" onerror="this.src='assets/default.svg'" alt="_aidenyoon">
-                    </div>
-                    <div class="info">
-                        <div class="username">_aidenyoon</div>
-                        <div class="fullname">윤여혁</div>
-                    </div>
-                    <a href="https://www.instagram.com/_aidenyoon/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/na_s2aem.jpg" onerror="this.src='assets/default.svg'" alt="na_s2aem">
-                    </div>
-                    <div class="info">
-                        <div class="username">na_s2aem</div>
-                        <div class="fullname">christina</div>
-                    </div>
-                    <a href="https://www.instagram.com/na_s2aem/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                <div class="user-card ">
-                    <div class="avatar-ring ">
-                        <img src="assets/peter_xeon.jpg" onerror="this.src='assets/default.svg'" alt="peter_xeon">
-                    </div>
-                    <div class="info">
-                        <div class="username">peter_xeon</div>
-                        <div class="fullname">전지성</div>
-                    </div>
-                    <a href="https://www.instagram.com/peter_xeon/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-                </div>
-            </section>
-
-            
-        <section class="section-group">
-            <h2 class="section-title">🏢 다이빙 센터 · 1곳</h2>
-            <div class="user-list">
-                
-                <div class="user-card center-card">
-                    <div class="avatar-ring center-ring">
-                        <img src="assets/calm_in_blue_freediving.jpg" onerror="this.src='assets/default.svg'" alt="calm_in_blue_freediving">
-                    </div>
-                    <div class="info">
-                        <div class="username">calm_in_blue_freediving<span class="tag center">다이빙 센터</span></div>
-                        <div class="fullname">캄인블루 서울/울릉도 프리다이빙센터</div>
-                    </div>
-                    <a href="https://www.instagram.com/calm_in_blue_freediving/" target="_blank" rel="noopener" class="btn">팔로우</a>
-                </div>
-    
-            </div>
-        </section>
-        
+            <a class="event-card" href="events/dahab26/">
+                <span class="event-icon dive">🤿</span>
+                <span class="event-info">
+                    <span class="event-name">'26년 이집트 다합</span>
+                    <span class="event-desc">Dahab Diving Tour · 10/2 ~ 10/13</span>
+                </span>
+                <span class="arrow">›</span>
+            </a>
+            <a class="event-card" href="events/t2t/">
+                <span class="event-icon run">🏃</span>
+                <span class="event-info">
+                    <span class="event-name">t2t running crew</span>
+                    <span class="event-desc">@t2t.runcrew · 러닝 크루 멤버</span>
+                </span>
+                <span class="arrow">›</span>
+            </a>
         </main>
-        <footer>
-            <p>10/2 ~ 10/13 Dahab Diving Tour</p>
-        </footer>
+        <footer>새 모임은 events/&lt;모임명&gt;/ 폴더로 추가됩니다</footer>
     </div>
-    <div id="toast" class="toast">✨ 전체 태그가 복사되었습니다!</div>
-    <script>
-        const TAG_TEXT = "@jjungoo.world\n@diver_yusin\n@ahang486\n@jieun.lee0000\n@_h.eco\n@_sungwo\n@ssun0ee\n@hssu__15\n@i_am_tosil\n@jvliehong\n@_aidenyoon\n@na_s2aem\n@peter_xeon\n@calm_in_blue_freediving";
-
-        function copyTags() {
-            const btn = document.getElementById('copyTagsBtn');
-            const btnText = btn.querySelector('.btn-text');
-            const btnIcon = btn.querySelector('.btn-icon');
-            const toast = document.getElementById('toast');
-
-            function onSuccess() {
-                btn.classList.add('copied');
-                btnIcon.textContent = '✅';
-                btnText.textContent = '복사 완료!';
-                if (toast) {
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
-                }
-                setTimeout(() => {
-                    btn.classList.remove('copied');
-                    btnIcon.textContent = '📋';
-                    btnText.textContent = '태그용 아이디 복사';
-                }, 2000);
-            }
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(TAG_TEXT).then(onSuccess).catch(() => fallbackCopy());
-            } else {
-                fallbackCopy();
-            }
-
-            function fallbackCopy() {
-                const textArea = document.createElement('textarea');
-                textArea.value = TAG_TEXT;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-9999px';
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    onSuccess();
-                } catch (err) {
-                    alert('복사에 실패했습니다.');
-                }
-                document.body.removeChild(textArea);
-            }
-        }
-    </script>
 </body>
 </html>

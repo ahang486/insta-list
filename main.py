@@ -173,6 +173,8 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
     heading = config.get("heading", title)
     non_insta_count = int(config.get("non_insta_count", 0))  # (참고용, 페이지에는 표시 안 함)
     schedule_url = config.get("schedule_url", "")
+    # 하위 폴더 페이지에서도 이미지가 깨지지 않도록 절대경로 사용
+    assets_prefix = config.get("assets_prefix", "/insta-list/assets")
 
     schedule_btn_html = f"""
                 <a href="{schedule_url}" target="_blank" rel="noopener" class="schedule-btn">
@@ -216,7 +218,7 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
                 cards_html += f"""
                 <div class="user-card {card_class}">
                     <div class="avatar-ring {ring_class}">
-                        <img src="assets/{user['username']}.jpg" onerror="this.src='assets/default.svg'" alt="{user['username']}">
+                        <img src="{assets_prefix}/{user['username']}.jpg" onerror="this.src='{assets_prefix}/default.svg'" alt="{user['username']}">
                     </div>
                     <div class="info">
                         <div class="username">{user['username']}{role_badge}{privacy_tag}</div>
@@ -229,7 +231,7 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
                 cards_html += f"""
                 <div class="user-card failed {card_class}">
                     <div class="avatar-ring muted">
-                        <img src="assets/default.svg" alt="{user['username']}">
+                        <img src="{assets_prefix}/default.svg" alt="{user['username']}">
                     </div>
                     <div class="info">
                         <div class="username">{user['username']}{role_badge}<span class="tag failed">조회 실패</span></div>
@@ -748,10 +750,18 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
 
 
 def main():
+    import sys
+    # 모임 폴더 모드: python main.py events/t2t → events/t2t/ 기준으로 읽고 루트에 index.html 생성
+    event_dir = sys.argv[1] if len(sys.argv) > 1 else ""
+    base = event_dir.rstrip("/") if event_dir else "."
+
     print("=" * 50)
-    print("🔍 Instagram Follower Tracker (Dahab Edition)")
+    if event_dir:
+        print(f"🔍 Instagram Follower Tracker — Event: {event_dir}")
+    else:
+        print("🔍 Instagram Follower Tracker (Dahab Edition)")
     print("=" * 50)
-    
+
     # assets 폴더 생성
     assets_dir = "assets"
     Path(assets_dir).mkdir(exist_ok=True)
@@ -759,10 +769,10 @@ def main():
     # 기본 이미지 준비
     create_default_image(assets_dir)
     
-    # 목록 로드
-    instructors_list = load_users("instructors.txt")
-    target_list = load_users("users.txt")
-    centers_list = load_users("centers.txt")
+    # 목록 로드 (모임 폴더 기준)
+    instructors_list = load_users(os.path.join(base, "instructors.txt"))
+    target_list = load_users(os.path.join(base, "users.txt"))
+    centers_list = load_users(os.path.join(base, "centers.txt"))
     
     print(f"\n📋 강사진: {len(instructors_list)}명")
     print(f"📋 참가자: {len(target_list)}명")
@@ -839,13 +849,13 @@ def main():
     # HTML 생성
     print("\n📝 HTML 파일 생성 중...")
     
-    config = load_config("config.json")
+    config = load_config(os.path.join(base, "config.json"))
 
     html_content = generate_html(instructors_data, users_data, centers_data, config)
     
-    with open("index.html", "w", encoding="utf-8") as f:
+    out_path = os.path.join(base, "index.html")
+    with open(out_path, "w", encoding="utf-8") as f:
         f.write(html_content)
-    
     # 결과 요약
     total_success = sum(1 for u in instructors_data if u["success"]) + sum(1 for u in users_data if u["success"]) + sum(1 for u in centers_data if u["success"])
     total_fail = (len(instructors_data) + len(users_data) + len(centers_data)) - total_success
@@ -857,7 +867,7 @@ def main():
     if centers_data:
         print(f"   - 다이빙 센터: {len(centers_data)}곳")
     print(f"   - 프로필 수집 성공: {total_success}명 / 실패: {total_fail}명")
-    print(f"   - 결과 파일: index.html")
+    print(f"   - 결과 파일: {out_path}")
     print(f"   - 이미지 폴더: {assets_dir}/")
     print("=" * 50)
 
