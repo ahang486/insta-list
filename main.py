@@ -16,28 +16,51 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def load_users(filepath: str = "users.txt") -> list[str]:
-    """users.txt / instructors.txt에서 사용자 목록을 읽어옵니다."""
+def load_users(filepath: str = "users.txt") -> list[dict]:
+    """users.txt / instructors.txt에서 사용자 목록을 읽어옵니다.
+
+    지원 형식:
+      @username          → 일반 인스타 계정
+      @이름 :non_insta   → 인스타 계정이 아닌 엔트리 (팔로우 버튼 없음, 태그 복사에 그대로 표시)
+    """
     users = []
-    
+
     if not os.path.exists(filepath):
         print(f"⚠️ {filepath} 파일이 없습니다.")
         return users
-    
+
     with open(filepath, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             # 빈 줄과 주석(#으로 시작) 무시
             if line and not line.startswith("#"):
-                # @로 시작하면 제거
+                # :non_insta 플래그 확인
+                non_insta = False
+                if line.endswith(":non_insta"):
+                    non_insta = True
+                    line = line[: -len(":non_insta")].strip()
                 username = line.lstrip("@")
-                users.append(username)
-    
+                users.append({"username": username, "non_insta": non_insta})
     return users
 
 
+def non_insta_entry(name: str) -> dict:
+    """인스타 계정이 아닌 엔트리(예: @한글이름)의 정보를 생성합니다."""
+    return {
+        "username": name,
+        "success": True,
+        "full_name": "",
+        "is_private": False,
+        "non_insta": True,
+    }
+
+
+def is_cached_entry(info: dict, cache: dict) -> bool:
+    """해당 엔트리가 캐시에서 왔는지 여부 (요청 슬립 판단용)."""
+    return info.get("username") in cache
+
+
 def download_image(url: str, save_path: str) -> bool:
-    """이미지를 다운로드하여 로컬에 저장합니다."""
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -175,10 +198,9 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
     schedule_url = config.get("schedule_url", "")
     # 하위 폴더 페이지에서도 이미지가 깨지지 않도록 절대경로 사용
     assets_prefix = config.get("assets_prefix", "/insta-list/assets")
-    # 크루 공식 계정 (사람이 아닌 계정 → 멤버 리스트에서 제외)
+    # 크루 공식 계정: 카드는 포함하되, 참가자 인원수 카운트에서는 제외
     crew_id = config.get("crew_id", "").lstrip("@")
-    if crew_id:
-        users_data = [u for u in users_data if u.get("username") != crew_id]
+    member_count = len([u for u in users_data if u.get("username") != crew_id])
 
     schedule_btn_html = f"""
                 <a href="{schedule_url}" target="_blank" rel="noopener" class="schedule-btn">
@@ -188,16 +210,12 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
     """ if schedule_url else ""
 
     # 복사할 태그 텍스트 생성 (@username 목록)
+    # non_insta 엔트리(예: @김고은)는 한글 이름 그대로 포함
     all_tag_users = []
-    for u in instructors_data:
+    for u in instructors_data + users_data + centers_data:
         if u.get("username"):
-            all_tag_users.append(f"@{u['username']}")
-    for u in users_data:
-        if u.get("username"):
-            all_tag_users.append(f"@{u['username']}")
-    for u in centers_data:
-        if u.get("username"):
-            all_tag_users.append(f"@{u['username']}")
+            name = u["username"]
+            all_tag_users.append(name if name.startswith("@") else f"@{name}")
     tag_text_js = json.dumps("\n".join(all_tag_users))
     
     # 사용자 카드 HTML 생성 헬퍼 함수
@@ -217,7 +235,21 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
                 card_class = ""
                 ring_class = ""
 
-            if user["success"]:
+            # 인스타 계정이 아닌 엔트리 (non_insta): 팔로우 버튼 없음
+            if user.get("non_insta"):
+                name = user["username"]
+                cards_html += f"""
+                <div class="user-card {card_class}">
+                    <div class="avatar-ring muted">
+                        <img src="{assets_prefix}/default.svg" alt="{name}">
+                    </div>
+                    <div class="info">
+                        <div class="username">{name}{role_badge}<span class="tag center">크루</span></div>
+                        <div class="fullname">{user.get('full_name') or '&nbsp;'}</div>
+                    </div>
+                </div>
+    """
+            elif user["success"]:
                 privacy_tag = '<span class="tag private">비공개</span>' if user["is_private"] else ''
                 cards_html += f"""
                 <div class="user-card {card_class}">
@@ -686,7 +718,7 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
             {instructors_section}
 
             <section class="section-group">
-                <h2 class="section-title">👥 참가자 · {len(users_data)}명</h2>
+                <h2 class="section-title">👥 참가자 · {member_count}명</h2>
                 <div class="user-list">
                     {create_user_cards(users_data, role="")}
                 </div>
@@ -822,20 +854,24 @@ def main():
     # 1. 강사진 처리
     if instructors_list:
         print("\n[1] 강사진 정보 수집 중...")
-        for i, username in enumerate(instructors_list, 1):
-            print(f"[{i}/{len(instructors_list)}] (강사) {username} 처리 중...")
-            info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
+        for i, entry in enumerate(instructors_list, 1):
+            print(f"[{i}/{len(instructors_list)}] (강사) {entry['username']} 처리 중...")
+            info = non_insta_entry(entry['username']) if entry.get('non_insta') else fetch_user_data(entry['username'], L, assets_dir, cache, cache_file)[0]
             instructors_data.append(info)
-            if i < len(instructors_list) and not is_cached:
+            if i < len(instructors_list) and not entry.get('non_insta') and not is_cached_entry(info, cache):
                 time.sleep(5)
 
     # 2. 일반 참가자 처리
     print("\n[2] 참가자 정보 수집 중...")
-    for i, username in enumerate(target_list, 1):
-        print(f"[{i}/{len(target_list)}] {username} 처리 중...")
-        info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
+    for i, entry in enumerate(target_list, 1):
+        print(f"[{i}/{len(target_list)}] {entry['username']} 처리 중...")
+        if entry.get('non_insta'):
+            info = non_insta_entry(entry['username'])
+            is_cached = True
+        else:
+            info, is_cached = fetch_user_data(entry['username'], L, assets_dir, cache, cache_file)
         users_data.append(info)
-        
+
         # 마지막 요청이 아니면 대기 (캐시 미사용 시에만)
         if i < len(target_list) and not is_cached:
             time.sleep(5)
@@ -843,11 +879,11 @@ def main():
     # 3. 다이빙 센터 처리
     if centers_list:
         print("\n[3] 다이빙 센터 정보 수집 중...")
-        for i, username in enumerate(centers_list, 1):
-            print(f"[{i}/{len(centers_list)}] (센터) {username} 처리 중...")
-            info, is_cached = fetch_user_data(username, L, assets_dir, cache, cache_file)
+        for i, entry in enumerate(centers_list, 1):
+            print(f"[{i}/{len(centers_list)}] (센터) {entry['username']} 처리 중...")
+            info = non_insta_entry(entry['username']) if entry.get('non_insta') else fetch_user_data(entry['username'], L, assets_dir, cache, cache_file)[0]
             centers_data.append(info)
-            if i < len(centers_list) and not is_cached:
+            if i < len(centers_list) and not entry.get('non_insta') and not is_cached_entry(info, cache):
                 time.sleep(5)
 
     # HTML 생성
