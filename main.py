@@ -735,14 +735,14 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
         <main>
             {instructors_section}
 
+            {crew_section}
+
             <section class="section-group">
                 <h2 class="section-title">👥 참가자 · {member_count}명</h2>
                 <div class="user-list">
                     {create_user_cards([u for u in users_data if u.get("username") != crew_id], role="")}
                 </div>
             </section>
-
-            {crew_section}
 
             {centers_section}
         </main>
