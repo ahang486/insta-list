@@ -152,7 +152,7 @@ def fetch_user_data(username: str, L: instaloader.Instaloader, assets_dir: str, 
 
 def load_config(filepath: str = "config.json") -> dict:
     """config.json에서 페이지 설정을 읽어옵니다."""
-    defaults = {"title": "Insta List", "heading": "Insta List", "non_insta_count": 0}
+    defaults = {"title": "Insta List", "heading": "Insta List", "non_insta_count": 0, "crew_id": ""}
     if not os.path.exists(filepath):
         return defaults
     try:
@@ -175,6 +175,10 @@ def generate_html(instructors_data: list[dict], users_data: list[dict], centers_
     schedule_url = config.get("schedule_url", "")
     # 하위 폴더 페이지에서도 이미지가 깨지지 않도록 절대경로 사용
     assets_prefix = config.get("assets_prefix", "/insta-list/assets")
+    # 크루 공식 계정 (사람이 아닌 계정 → 멤버 리스트에서 제외)
+    crew_id = config.get("crew_id", "").lstrip("@")
+    if crew_id:
+        users_data = [u for u in users_data if u.get("username") != crew_id]
 
     schedule_btn_html = f"""
                 <a href="{schedule_url}" target="_blank" rel="noopener" class="schedule-btn">
